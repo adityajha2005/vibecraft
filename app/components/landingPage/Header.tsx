@@ -37,7 +37,7 @@ const Header = () => {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <nav className="fixed w-full bg-white bg-opacity-50 backdrop-blur-xl text-black border-b border-gray-400 shadow-sm z-50 px-6 md:px-16">
+    <nav className="fixed w-full bg-white bg-opacity-50 backdrop-blur-xl text-black border-b border-gray-400 shadow-sm z-10 px-6 md:px-16">
       <div id="main" className="container mx-auto h-16 flex items-center justify-between">
         {/* Logo Section */}
         <div className="flex items-center gap-2">
