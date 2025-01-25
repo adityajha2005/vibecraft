@@ -4,7 +4,7 @@ import { MessageSquare } from "lucide-react";
 
 const Testimonials = () => {
   return (
-    <div className="py-24 bg-white">
+    <div id="testimonials" className="py-24 bg-white">
       <div className="container mx-auto px-6 md:px-20 text-center">
         {/* Heading Section */}
         <h2 className="text-3xl md:text-4xl font-bold mb-12 text-black">What Our Artists Say</h2>

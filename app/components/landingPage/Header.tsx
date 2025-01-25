@@ -3,9 +3,26 @@
 import { Palette, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+
+const handleSmoothScroll = (
+  e: React.MouseEvent<HTMLAnchorElement>,
+  targetId: string,
+  isHomePage: boolean
+) => {
+  e.preventDefault();
+  if (!isHomePage) {
+    window.location.href = `/${targetId}`;
+    return;
+  }
+  const target = document.querySelector(targetId);
+  target?.scrollIntoView({ behavior: "smooth" });
+};
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   const toggleMenu = () => setIsMobileMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMobileMenuOpen(false);
@@ -23,13 +40,25 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
-          <Link href="#features" className="text-black hover:text-gray-700 transition">
+          <Link
+            href={isHomePage ? "#features" : "/#features"}
+            className="text-black hover:text-gray-700 transition"
+            onClick={(e) => handleSmoothScroll(e, "#features", isHomePage)}
+          >
             Features
           </Link>
-          <Link href="#how-it-works" className="text-black hover:text-gray-700 transition">
+          <Link
+            href={isHomePage ? "#howworks" : "/#howworks"}
+            className="text-black hover:text-gray-700 transition"
+            onClick={(e) => handleSmoothScroll(e, "#howworks", isHomePage)}
+          >
             How It Works
           </Link>
-          <Link href="#testimonials" className="text-black hover:text-gray-700 transition">
+          <Link
+            href={isHomePage ? "#testimonials" : "/#testimonials"}
+            className="text-black hover:text-gray-700 transition"
+            onClick={(e) => handleSmoothScroll(e, "#testimonials", isHomePage)}
+          >
             Testimonials
           </Link>
         </div>
@@ -73,23 +102,23 @@ const Header = () => {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the menu
           >
             <Link
-              href="#features"
+              href={isHomePage ? "#features" : "/#features"}
               className="text-black text-md hover:text-gray-700 transition"
-              onClick={closeMenu}
+              onClick={(e) => handleSmoothScroll(e, "#features", isHomePage)}
             >
               Features
             </Link>
             <Link
-              href="#how-it-works"
+              href={isHomePage ? "#howworks" : "/#howworks"}
               className="text-black text-md hover:text-gray-700 transition"
-              onClick={closeMenu}
+              onClick={(e) => handleSmoothScroll(e, "#howworks", isHomePage)}
             >
               How It Works
             </Link>
             <Link
-              href="#testimonials"
+              href={isHomePage ? "#testimonials" : "/#testimonials"}
               className="text-black text-md hover:text-gray-700 transition"
-              onClick={closeMenu}
+              onClick={(e) => handleSmoothScroll(e, "#testimonials", isHomePage)}
             >
               Testimonials
             </Link>

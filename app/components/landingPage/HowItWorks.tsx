@@ -4,7 +4,7 @@ import { Zap, Brush, Star } from "lucide-react";
 
 const HowItWorks = () => {
   return (
-    <div className="py-24 bg-white">
+    <div id="howworks" className="py-24 bg-white">
       <div className="container mx-auto px-6 md:px-20 text-center">
         {/* Heading Section */}
         <h2 className="text-3xl md:text-4xl font-bold mb-12 text-black">How It Works</h2>
