@@ -25,7 +25,7 @@ const Hero = () => {
 
           {/* Buttons */}
           <div className="flex gap-4 text-sm md:text-lg">
-            <Link href="/signup">
+            <Link href="/dashboard">
               <button className="px-3 py-3 md:px-6 md:py-3 text-white bg-gray-800 rounded-2xl font-semibold hover:bg-gray-700 transition flex items-center gap-2">
                 Start Creating <Sparkles className="h-5 w-5" />
               </button>

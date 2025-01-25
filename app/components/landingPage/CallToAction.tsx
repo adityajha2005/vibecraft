@@ -10,7 +10,7 @@ const CallToAction = () => {
       <p className="text-md md:text-lg text-white/80 mb-8">
         Join thousands of artists and start your journey with VibeCraft today.
       </p>
-      <Link href="/signup">
+      <Link href="/dashboard">
         <button className="text-sm md:text-lg px-4 py-2 md:px-6 md:py-3 text-black bg-white rounded-2xl font-semibold hover:bg-gray-300 transition">
           Get Started Now <ChevronRight className="h-5 w-5 inline" />
         </button>
