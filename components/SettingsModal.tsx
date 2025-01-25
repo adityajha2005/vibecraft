@@ -44,12 +44,12 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
                   type="number"
                   value={settings.seed}
                   onChange={(e) => handleChange('seed', parseInt(e.target.value))}
-                  className="flex-1 p-2 border rounded-md"
+                  className="flex-1 p-2 border rounded-xl"
                   placeholder="Enter seed number"
                 />
                 <button
                   onClick={() => handleChange('seed', Math.floor(Math.random() * 1000000))}
-                  className="px-3 py-2 bg-slate-100 rounded-md text-sm hover:bg-slate-200"
+                  className="px-3 py-2 bg-slate-100 rounded-xl text-sm hover:bg-slate-200"
                 >
                   Random
                 </button>
@@ -64,8 +64,8 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
                   <button
                     key={shape}
                     onClick={() => handleChange('shape', shape)}
-                    className={`p-2 border rounded-md text-sm capitalize ${
-                      settings.shape === shape ? 'border-blue-500 bg-blue-50' : 'hover:bg-slate-50'
+                    className={`p-2 border rounded-xl text-sm capitalize ${
+                      settings.shape === shape ? 'border-black bg-gray-100' : 'hover:bg-slate-50'
                     }`}
                   >
                     {shape}
@@ -80,7 +80,7 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
               <select
                 value={settings.size}
                 onChange={(e) => handleChange('size', e.target.value)}
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="512x512">512 x 512</option>
                 <option value="768x768">768 x 768</option>
@@ -96,7 +96,7 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
               <select
                 value={settings.style}
                 onChange={(e) => handleChange('style', e.target.value)}
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="natural">Natural</option>
                 <option value="anime">Anime</option>
@@ -111,12 +111,12 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
             <div className="space-y-2">
               <label className="text-sm font-medium">Quality</label>
               <div className="grid grid-cols-3 gap-2">
-                {['standard', 'hd', 'ultra-hd'].map((quality) => (
+                {['Standard', 'HD', 'Ultra HD'].map((quality) => (
                   <button
                     key={quality}
                     onClick={() => handleChange('quality', quality)}
-                    className={`p-2 border rounded-md text-sm capitalize ${
-                      settings.quality === quality ? 'border-blue-500 bg-blue-50' : 'hover:bg-slate-50'
+                    className={`p-2 border rounded-xl text-sm capitalize ${
+                      settings.quality === quality ? 'border-black bg-gray-100' : 'hover:bg-slate-50'
                     }`}
                   >
                     {quality}
@@ -131,7 +131,7 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
               <textarea
                 value={settings.negativePrompt}
                 onChange={(e) => handleChange('negativePrompt', e.target.value)}
-                className="w-full p-3 border rounded-lg h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full p-3 border rounded-xl h-24 resize-none focus:ring-2 focus:ring-black focus:outline-none"
                 placeholder="Enter things you don't want in the image..."
               />
             </div>
@@ -141,13 +141,13 @@ const SettingsModal = ({ isOpen, onClose, settings, onSettingsChange }: Settings
         <div className="p-4 border-t bg-slate-50 flex justify-end gap-2 shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-md hover:bg-slate-100"
+            className="px-4 py-2 border rounded-xl hover:bg-slate-100"
           >
             Cancel
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-800"
           >
             Apply Settings
           </button>
