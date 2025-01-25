@@ -65,21 +65,21 @@ const Dashboard = () => {
           {/* Left Tool Group */}
           <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-start">
             <Link href="/">
-              <button className="p-2.5 hover:bg-slate-100 rounded-md flex items-center">
+              <button className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center">
                 <IoHome className="w-5 h-5" />
               </button>
             </Link>
             <div className="flex items-center space-x-2">
               <button 
                 onClick={() => setScale(scale => scale + 0.1)}
-                className="p-2.5 hover:bg-slate-100 rounded-md flex items-center"
+                className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center"
               >
                 <IoAdd className="w-5 h-5" />
               </button>
               <span className="text-sm font-medium w-12 text-center">{Math.round(scale * 100)}%</span>
               <button 
                 onClick={() => setScale(scale => Math.max(0.5, scale - 0.1))}
-                className="p-2.5 hover:bg-slate-100 rounded-md flex items-center"
+                className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center"
               >
                 <IoRemove className="w-5 h-5" />
               </button>
@@ -91,7 +91,7 @@ const Dashboard = () => {
             <button
               onClick={handleDownload}
               disabled={!displayImage}
-              className="p-2.5 hover:bg-slate-100 rounded-md flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
+              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
               title="Download Image"
             >
               <IoDownloadOutline className="w-5 h-5" />
@@ -101,7 +101,7 @@ const Dashboard = () => {
             <button
               onClick={() => setIsEnhancing(true)}
               disabled={!displayImage || isEnhancing}
-              className="p-2.5 hover:bg-slate-100 rounded-md flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
+              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
               title="Enhance Image"
             >
               <IoSparklesOutline className="w-5 h-5" />
@@ -111,7 +111,7 @@ const Dashboard = () => {
             <button
               onClick={() => {/* Generate variations logic */}}
               disabled={!displayImage}
-              className="p-2.5 hover:bg-slate-100 rounded-md flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
+              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
               title="Generate Variations"
             >
               <IoCopyOutline className="w-5 h-5" />
@@ -122,7 +122,7 @@ const Dashboard = () => {
 
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="p-2.5 hover:bg-slate-100 rounded-md"
+              className="p-2.5 hover:bg-slate-100 rounded-xl"
               title="Image Settings"
             >
               <IoSettings className="w-5 h-5" />
@@ -229,11 +229,11 @@ const Dashboard = () => {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Enter your prompt here..."
-              className="w-full p-2 sm:p-3 border rounded-lg resize-none h-[80px] sm:h-[100px] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-black-500"
+              className="w-full p-2 sm:p-3 border rounded-xl resize-none h-[80px] sm:h-[100px] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-black-500"
             />
             <button 
               type="submit"
-              className="mt-2 sm:mt-3 w-full bg-black text-white py-2 sm:py-2.5 rounded-lg hover:bg-black text-xs sm:text-sm font-medium transition-colors"
+              className="mt-2 sm:mt-3 w-full bg-black text-white py-2 sm:py-2.5 rounded-xl hover:bg-black text-xs sm:text-sm font-medium transition-colors"
             >
               Generate Image
             </button>
