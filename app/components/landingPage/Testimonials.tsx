@@ -1,39 +1,46 @@
-"use client";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 
-import { MessageSquare } from "lucide-react";
-
-const Testimonials = () => {
+const Testimonials=() =>{
+  const testimonials = [
+    {
+      quote: "VibeCraft revolutionized my creative process. The adaptive AI is incredible!",
+      name: "Alex",
+      designation: "Creative Director at Visionary Studios",
+      src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=3560&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote: "The sensory-friendly features are a game changer. Highly recommend!",
+      name: "Jordan",
+      designation: "UX Specialist at Harmony Tech",
+      src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote: "Collaboration is so seamless with ArtSync. Love the community vibe!",
+      name: "Taylor",
+      designation: "Community Manager at SyncWorks",
+      src: "https://images.unsplash.com/photo-1623582854588-d60de57fa33f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote: "ArtFusion's intuitive interface transformed the way I work with teams. It’s a must-have!",
+      name: "Chris",
+      designation: "Lead Designer at Creatify",
+      src: "https://images.unsplash.com/photo-1636041293178-808a6762ab39?q=80&w=3464&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote: "The adaptive tools are exactly what our team needed to boost productivity. Highly recommend!",
+      name: "Morgan",
+      designation: "Product Manager at TechFlow",
+      src: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=2592&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    }
+  ];
+  
   return (
-    <div id="testimonials" className="py-24 bg-white">
-      <div className="container mx-auto px-6 md:px-20 text-center">
-        {/* Heading Section */}
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-black">What Our Artists Say</h2>
-
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { name: "Alex", review: "VibeCraft revolutionized my creative process. The adaptive AI is incredible!" },
-            { name: "Jordan", review: "The sensory-friendly features are a game changer. Highly recommend!" },
-            { name: "Taylor", review: "Collaboration is so seamless with ArtSync. Love the community vibe!" },
-          ].map((testimonial, index) => (
-            <div
-              key={index}
-              className="p-6 border rounded-xl bg-white shadow-md hover:shadow-xl transition-shadow"
-            >
-              {/* Icon */}
-              <MessageSquare className="mb-4 text-black h-8 w-8 mx-auto" />
-
-              {/* Review Text */}
-              <p className="text-md md:text-lg italic text-gray-700">"{testimonial.review}"</p>
-
-              {/* Name */}
-              <h3 className="mt-4 text-lg  md:text-xl font-bold text-gray-900">- {testimonial.name}</h3>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <>
+    <div className="mb-10 mt-16">
+    <h2 className="text-3xl md:text-4xl font-bold mb-2 text-center text-black z-100">What Our Artists Say</h2>
+  <AnimatedTestimonials testimonials={testimonials} />
+  </div>
+  </>
   );
-};
-
+}
 export default Testimonials;
