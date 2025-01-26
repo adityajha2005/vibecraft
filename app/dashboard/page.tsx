@@ -1,23 +1,19 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import {
-  IoAdd,
-  IoRemove,
-  IoCamera,
-  IoVideocam,
-  IoVideocamOff,
-  IoDownloadOutline,
-  IoSparklesOutline,
-  IoCopyOutline,
-  IoSettings,
-  IoHome,
-} from 'react-icons/io5';
+import { IoVideocam, IoVideocamOff, IoCamera } from 'react-icons/io5'; // Import icons
+import Toolbar from '@/components/dashboard/Toolbar';
+import SketchCanvas from '@/components/dashboard/SketchCanvas';
+import CameraPanel from '@/components/dashboard/CameraPanel';
+import PromptPanel from '@/components/dashboard/PromptPanel';
 import SettingsModal from '@/components/SettingsModal';
 import type { ImageSettings } from '@/components/SettingsModal';
+import Footer from '@/components/dashboard/Footer';
+import SketchFeatures from '@/components/dashboard/SketchFeatures';
+import { generateImageFromSketch } from '@/lib/sketch-to-image';
 
 const Dashboard = () => {
+  // State variables
   const [scale, setScale] = useState(1);
   const [prompt, setPrompt] = useState('');
   const [history, setHistory] = useState<string[]>([]);
@@ -25,7 +21,12 @@ const Dashboard = () => {
   const [displayImage, setDisplayImage] = useState<string | null>(null);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [variations, setVariations] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSketchMode, setIsSketchMode] = useState(false); // Missing state
+  const [activeColor, setActiveColor] = useState('#000000'); // Missing state
+  const [brushSize, setBrushSize] = useState(5); // Missing state
   const [imageSettings, setImageSettings] = useState<ImageSettings>({
     seed: Math.floor(Math.random() * 1000000),
     shape: 'square',
@@ -35,7 +36,7 @@ const Dashboard = () => {
     negativePrompt: '',
   });
 
-  // Fetch saved artworks for the current user (example userId)
+  // Fetch saved artworks for the current user
   const userId = 'user-id-here'; // Replace with actual user ID
   useEffect(() => {
     const fetchArtworks = async () => {
@@ -63,12 +64,13 @@ const Dashboard = () => {
         const response = await fetch('/api/ai/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt, ...imageSettings }), // Include image settings
         });
         const data = await response.json();
         setDisplayImage(data.imageUrl); // Set the generated image
       } catch (error) {
         console.error('Failed to generate image:', error);
+        alert('Failed to generate image. Please try again.');
       }
 
       setPrompt('');
@@ -90,8 +92,10 @@ const Dashboard = () => {
         });
         const data = await response.json();
         console.log('Artwork saved:', data);
+        alert('Artwork saved successfully!');
       } catch (error) {
         console.error('Failed to save artwork:', error);
+        alert('Failed to save artwork. Please try again.');
       }
     }
   };
@@ -105,137 +109,92 @@ const Dashboard = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    } else {
+      alert('No image to download.');
     }
   };
 
+  // Handle generating image from sketch
+  const handleGenerateFromSketch = async (sketchDataUrl: string) => {
+    setIsGenerating(true);
+    try {
+      const result = await generateImageFromSketch(sketchDataUrl);
+      const imageUrl = URL.createObjectURL(result);
+      setGeneratedImage(imageUrl);
+      setDisplayImage(imageUrl);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('An error occurred while generating the image. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Handle camera activation
+  useEffect(() => {
+    if (isCameraActive) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          const videoElement = document.querySelector('video');
+          if (videoElement) {
+            videoElement.srcObject = stream;
+          }
+        })
+        .catch((error) => {
+          console.error('Error accessing camera:', error);
+          alert('Failed to access camera. Please ensure permissions are granted.');
+        });
+    }
+  }, [isCameraActive]);
+
+  // Clean up camera stream on unmount
+  useEffect(() => {
+    return () => {
+      const videoElement = document.querySelector('video');
+      if (videoElement && videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   return (
-    <div className="h-screen w-full relative bg-slate-50 overflow-hidden">
-      <div className="w-full h-full relative">
-        {/* Toolbar */}
-        <div className="fixed top-0 left-0 right-0 h-auto min-h-[56px] bg-white border-b shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 sm:px-6 z-10">
-          {/* Left Tool Group */}
-          <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-start">
-            <Link href="/">
-              <button className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center">
-                <IoHome className="w-5 h-5" />
-              </button>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setScale((scale) => scale + 0.1)}
-                className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center"
-              >
-                <IoAdd className="w-5 h-5" />
-              </button>
-              <span className="text-sm font-medium w-12 text-center">{Math.round(scale * 100)}%</span>
-              <button
-                onClick={() => setScale((scale) => Math.max(0.5, scale - 0.1))}
-                className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center"
-              >
-                <IoRemove className="w-5 h-5" />
-              </button>
+    <div className="min-h-screen w-full relative bg-slate-50 overflow-y-auto">
+      <Toolbar
+        scale={scale}
+        setScale={setScale}
+        isSketchMode={isSketchMode}
+        setIsSketchMode={setIsSketchMode}
+        displayImage={displayImage}
+        isEnhancing={isEnhancing}
+        setIsEnhancing={setIsEnhancing}
+        setIsSettingsOpen={setIsSettingsOpen}
+        handleDownload={handleDownload}
+      />
+
+      <motion.div className="w-full min-h-[calc(100vh-72px)] mt-[72px] sm:mt-14 relative">
+        {isSketchMode ? (
+          <SketchCanvas
+            activeColor={activeColor}
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
+            setActiveColor={setActiveColor}
+            onGenerate={handleGenerateFromSketch}
+            isGenerating={isGenerating}
+          />
+        ) : (
+          displayImage && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <img
+                src={displayImage}
+                alt="Generated"
+                className="max-w-[800px] rounded-lg shadow-lg"
+              />
             </div>
-          </div>
-
-          {/* Right Tool Groups - Image Actions */}
-          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end mt-2 sm:mt-0">
-            <button
-              onClick={handleDownload}
-              disabled={!displayImage}
-              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
-              title="Download Image"
-            >
-              <IoDownloadOutline className="w-5 h-5" />
-              Download
-            </button>
-
-            <button
-              onClick={handleSaveArtwork}
-              disabled={!displayImage}
-              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
-              title="Save Artwork"
-            >
-              Save
-            </button>
-
-            <button
-              onClick={() => setIsEnhancing(true)}
-              disabled={!displayImage || isEnhancing}
-              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
-              title="Enhance Image"
-            >
-              <IoSparklesOutline className="w-5 h-5" />
-              {isEnhancing ? 'Enhancing...' : 'Enhance'}
-            </button>
-
-            <button
-              onClick={() => {/* Generate variations logic */}}
-              disabled={!displayImage}
-              className="p-2.5 hover:bg-slate-100 rounded-xl flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
-              title="Generate Variations"
-            >
-              <IoCopyOutline className="w-5 h-5" />
-              Variations
-            </button>
-
-            <div className="h-6 border-l mx-2" />
-
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-2.5 hover:bg-slate-100 rounded-xl"
-              title="Image Settings"
-            >
-              <IoSettings className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Canvas */}
-        <motion.div
-          className="w-full h-[calc(100vh-72px)] sm:h-[calc(100vh-56px)] mt-[72px] sm:mt-14 relative"
-          drag
-          dragMomentum={false}
-        >
-          <div
-            className="absolute top-0 left-0 w-full h-full"
-            style={{
-              backgroundSize: '40px 40px',
-              backgroundImage:
-                'linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)',
-              transform: `scale(${scale})`,
-              transformOrigin: '0 0',
-            }}
-          >
-            {/* Image Display Area */}
-            {displayImage && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <img
-                  src={displayImage}
-                  alt="Generated"
-                  className="max-w-[500px] rounded-lg shadow-lg"
-                />
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {variations.length > 0 && (
-          <div className="fixed left-4 top-16 bg-white p-2 rounded-lg shadow-lg">
-            <h3 className="text-sm font-semibold mb-2">Variations</h3>
-            <div className="flex gap-2">
-              {variations.map((variation, index) => (
-                <img
-                  key={index}
-                  src={variation}
-                  alt={`Variation ${index + 1}`}
-                  className="w-20 h-20 object-cover rounded cursor-pointer hover:ring-2 ring-black"
-                  onClick={() => setDisplayImage(variation)}
-                />
-              ))}
-            </div>
-          </div>
+          )
         )}
-      </div>
+      </motion.div>
 
       {/* Floating Panel with Camera and Prompt */}
       <div className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] flex flex-col gap-4 p-4 sm:p-0">
@@ -264,7 +223,7 @@ const Dashboard = () => {
                 <IoCamera size={24} />
               </div>
             )}
-            {/* Facial Recognition Overlay */}
+            {/* Facial Recognition Overlay (to be implemented) */}
             <div className="absolute inset-0 pointer-events-none">
               {/* Face detection overlay */}
             </div>
@@ -303,13 +262,17 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={imageSettings}
         onSettingsChange={setImageSettings}
       />
+
+      <div className="mb-8">
+        <SketchFeatures />
+      </div>
+      <Footer />
     </div>
   );
 };
