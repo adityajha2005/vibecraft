@@ -8,6 +8,7 @@ interface SketchCanvasProps {
   setBrushSize: (size: number) => void
   setActiveColor: (color: string) => void
   onGenerate: (dataUrl: string) => void
+  isGenerating: boolean
 }
 
 const SketchCanvas = ({
@@ -15,7 +16,8 @@ const SketchCanvas = ({
   brushSize,
   setBrushSize,
   setActiveColor,
-  onGenerate
+  onGenerate,
+  isGenerating
 }: SketchCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const contextRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -92,10 +94,10 @@ const SketchCanvas = ({
   }
 
   const handleGenerate = () => {
-    if (!canvasRef.current) return
-    const sketchDataUrl = canvasRef.current.toDataURL('image/png')
-    onGenerate(sketchDataUrl)
-  }
+    if (!canvasRef.current) return;
+    const sketchDataUrl = canvasRef.current.toDataURL('image/png');
+    onGenerate(sketchDataUrl);
+  };
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
@@ -139,15 +141,14 @@ const SketchCanvas = ({
       </div>
 
       <div className="w-full sm:w-auto mt-6 mb-8 flex justify-center">
-        <button
-          onClick={handleGenerate}
-          className="px-8 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition-colors font-medium"
-        >
-          Generate from Sketch
-        </button>
+      <button
+  onClick={handleGenerate}
+  disabled={isGenerating}
+  className="px-8 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+>
+  {isGenerating ? 'Generating...' : 'Generate from Sketch'}
+</button>
       </div>
-
-      
     </div>
   )
 }

@@ -11,6 +11,7 @@ import type { ImageSettings } from '@/components/SettingsModal'
 // import Footer from '../components/landingPage/Footer'
 import Footer from '@/components/dashboard/Footer'
 import SketchFeatures from '@/components/dashboard/SketchFeatures'
+import { generateImageFromSketch } from '@/lib/sketch-to-image'
 const Dashboard = () => {
   const [scale, setScale] = useState(1)
   const [prompt, setPrompt] = useState('')
@@ -21,6 +22,8 @@ const Dashboard = () => {
   const [activeColor, setActiveColor] = useState('#000000')
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [variations, setVariations] = useState<string[]>([])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [imageSettings, setImageSettings] = useState<ImageSettings>({
     seed: Math.floor(Math.random() * 1000000),
@@ -54,10 +57,22 @@ const Dashboard = () => {
     }
   }
 
-  const handleGenerateFromSketch = (sketchDataUrl: string) => {
-    setDisplayImage(sketchDataUrl)
-    //will add sketchdata url (hugging face)
+  const handleGenerateFromSketch = async (sketchDataUrl: string) => {
+    setIsGenerating(true);
+    try {
+      const result = await generateImageFromSketch(sketchDataUrl);
+      const imageUrl = URL.createObjectURL(result);
+      setGeneratedImage(imageUrl);
+      setDisplayImage(imageUrl);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert("An error occurred while generating the image. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   }
+  
+
 
   return (
     <div className="min-h-screen w-full relative bg-slate-50 overflow-y-auto">
@@ -76,12 +91,13 @@ const Dashboard = () => {
       <motion.div className="w-full min-h-[calc(100vh-72px)] mt-[72px] sm:mt-14 relative">
         {isSketchMode ? (
           <SketchCanvas
-            activeColor={activeColor}
-            brushSize={brushSize}
-            setBrushSize={setBrushSize}
-            setActiveColor={setActiveColor}
-            onGenerate={handleGenerateFromSketch}
-          />
+          activeColor={activeColor}
+          brushSize={brushSize}
+          setBrushSize={setBrushSize}
+          setActiveColor={setActiveColor}
+          onGenerate={handleGenerateFromSketch}
+          isGenerating={isGenerating}
+        />        
         ) : (
           displayImage && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
