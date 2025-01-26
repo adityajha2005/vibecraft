@@ -19,7 +19,7 @@ export async function generateImageFromSketch(sketch: string, prompt: string) {
       }
     });
     return response;
-  } catch (error) {
+  } catch (error:any) {
     if (error.message?.includes('loading')) {
       throw new Error('Model is currently loading. Please wait a few moments and try again.');
     }
