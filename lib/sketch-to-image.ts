@@ -1,7 +1,7 @@
 import { HfInference } from '@huggingface/inference';
 
 const API_TOKEN = process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY;
-const MODEL_ID = "stabilityai/stable-diffusion-2-1";
+const MODEL_ID = "kandinsky-community/kandinsky-2-2-decoder";
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000; // 5 seconds
 

@@ -59,8 +59,8 @@ const Dashboard = () => {
   const handleGenerateFromSketch = async (sketchDataUrl: string, prompt: string) => {
     setIsGenerating(true);
     try {
-      const result = await generateImageFromSketch(sketchDataUrl, prompt);
-      const imageUrl = URL.createObjectURL(result);
+      const response = await generateImageFromSketch(sketchDataUrl, prompt);
+      const imageUrl = URL.createObjectURL(response);
       setGeneratedImage(imageUrl);
       setDisplayImage(imageUrl);
     } catch (error) {
