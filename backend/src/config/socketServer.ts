@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+const { Server } = require('socket.io'); // Use require instead of import
 import http from 'http';
 
 const initializeSocket = (server: http.Server) => {
