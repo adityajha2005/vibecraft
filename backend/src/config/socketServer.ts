@@ -3,9 +3,11 @@ import http from 'http';
 
 const initializeSocket = (server: http.Server) => {
   const io = new Server(server, { cors: { origin: '*' } });
-  io.on('connection', (socket) => {
+
+  io.on('connection', (socket: any) => { // Add type annotation for 'socket'
     console.log('User connected:', socket.id);
   });
+
   return io;
 };
 
