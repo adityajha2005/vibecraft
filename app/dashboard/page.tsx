@@ -12,6 +12,7 @@ import Footer from '@/components/dashboard/Footer';
 import SketchFeatures from '@/components/dashboard/SketchFeatures';
 import { generateImageFromSketch } from '@/lib/sketch-to-image';
 
+
 const Dashboard = () => {
   // State variables
   const [scale, setScale] = useState(1);
@@ -114,11 +115,11 @@ const Dashboard = () => {
     }
   };
 
-  // Handle generating image from sketch
-  const handleGenerateFromSketch = async (sketchDataUrl: string) => {
+
+  const handleGenerateFromSketch = async (sketchDataUrl: string, prompt: string) => {
     setIsGenerating(true);
     try {
-      const result = await generateImageFromSketch(sketchDataUrl);
+      const result = await generateImageFromSketch(sketchDataUrl, prompt);
       const imageUrl = URL.createObjectURL(result);
       setGeneratedImage(imageUrl);
       setDisplayImage(imageUrl);
@@ -183,6 +184,7 @@ const Dashboard = () => {
             onGenerate={handleGenerateFromSketch}
             isGenerating={isGenerating}
           />
+
         ) : (
           displayImage && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -277,4 +279,5 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+
+export default Dashboard
