@@ -1,12 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import artworkRoutes from './routes/artworkRoutes';
 import userRoutes from './routes/userRoutes';
 import aiRoutes from './routes/aiRoutes'; // Import AI routes
 
+const dotenv = require('dotenv'); // Use require instead of import
 dotenv.config();
-
 const app = express();
 app.use(cors());
 app.use(express.json());
