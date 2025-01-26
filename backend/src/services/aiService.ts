@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+interface ReplicateResponse {
+  output: string; // Define the expected type for the output
+}
+
 export const generateImageFromPrompt = async (prompt: string) => {
   try {
-    const response = await axios.post(
+    const response = await axios.post<ReplicateResponse>(
       'https://api.replicate.com/v1/predictions',
       {
         version: 'your-model-version', // Replace with your model version
@@ -14,7 +18,7 @@ export const generateImageFromPrompt = async (prompt: string) => {
         },
       }
     );
-    return response.data.output; // URL of the generated image
+    return response.data.output; // TypeScript now knows the type of response.data
   } catch (error) {
     console.error('Error generating image:', error);
     throw error;
