@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [prompt, setPrompt] = useState('');
   const [history, setHistory] = useState<string[]>([]);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [displayImage, setDisplayImage] = useState<string | null>(null);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [variations, setVariations] = useState<string[]>([]);
@@ -119,13 +120,12 @@ const Dashboard = () => {
   const handleGenerateFromSketch = async (sketchDataUrl: string, prompt: string) => {
     setIsGenerating(true);
     try {
-      const response = await generateImageFromSketch(sketchDataUrl, prompt);
-      const imageUrl = URL.createObjectURL(response);
-      setGeneratedImage(imageUrl);
-      setDisplayImage(imageUrl);
+      // Just pass through the ArrayBuffer from generateImageFromSketch
+      return await generateImageFromSketch(sketchDataUrl, prompt);
     } catch (error) {
       console.error('Error generating image:', error);
       alert('An error occurred while generating the image. Please try again.');
+      throw error;
     } finally {
       setIsGenerating(false);
     }
@@ -200,6 +200,7 @@ const Dashboard = () => {
 
       {/* Floating Panel with Camera and Prompt */}
       <div className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] flex flex-col gap-4 p-4 sm:p-0">
+     
         {/* Camera Preview */}
         <div className="bg-white rounded-xl shadow-lg">
           <div className="p-3 sm:p-4 border-b flex justify-between items-center">
