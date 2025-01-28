@@ -11,7 +11,7 @@ import type { ImageSettings } from '@/components/SettingsModal';
 import Footer from '@/components/dashboard/Footer';
 import SketchFeatures from '@/components/dashboard/SketchFeatures';
 import { generateImageFromSketch } from '@/lib/sketch-to-image';
-
+import MinimizeButton from '@/components/dashboard/MinimizeButton';
 
 const Dashboard = () => {
   // State variables
@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [isSketchMode, setIsSketchMode] = useState(false); // Missing state
   const [activeColor, setActiveColor] = useState('#000000'); // Missing state
   const [brushSize, setBrushSize] = useState(5); // Missing state
+  const [isCameraMinimized, setIsCameraMinimized] = useState(false);
+  const [isPromptMinimized, setIsPromptMinimized] = useState(false);
   const [imageSettings, setImageSettings] = useState<ImageSettings>({
     seed: Math.floor(Math.random() * 1000000),
     shape: 'square',
@@ -202,66 +204,83 @@ const Dashboard = () => {
       <div className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] flex flex-col gap-4 p-4 sm:p-0">
      
         {/* Camera Preview */}
-        <div className="bg-white rounded-xl shadow-lg">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-3 sm:p-4 border-b flex justify-between items-center">
             <h2 className="text-sm sm:text-base font-semibold">Camera Preview</h2>
-            <button
-              onClick={() => setIsCameraActive(!isCameraActive)}
-              className={`p-2 rounded-md ${isCameraActive ? 'bg-red-500 text-white' : 'bg-slate-100'}`}
-            >
-              {isCameraActive ? <IoVideocamOff /> : <IoVideocam />}
-            </button>
-          </div>
-
-          <div className="aspect-video relative bg-slate-900 overflow-hidden">
-            {isCameraActive ? (
-              <video
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                playsInline
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsCameraActive(!isCameraActive)}
+                className={`p-2 rounded-md ${isCameraActive ? 'bg-red-500 text-white' : 'bg-slate-100'}`}
+              >
+                {isCameraActive ? <IoVideocamOff /> : <IoVideocam />}
+              </button>
+              <MinimizeButton 
+                isMinimized={isCameraMinimized}
+                onClick={() => setIsCameraMinimized(!isCameraMinimized)}
               />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <IoCamera size={24} />
-              </div>
-            )}
-            {/* Facial Recognition Overlay (to be implemented) */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Face detection overlay */}
             </div>
           </div>
+
+          {!isCameraMinimized && (
+            <div className="aspect-video relative bg-slate-900 overflow-hidden">
+              {isCameraActive ? (
+                <video
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  playsInline
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  <IoCamera size={24} />
+                </div>
+              )}
+              {/* Facial Recognition Overlay (to be implemented) */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Face detection overlay */}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Prompt Area */}
-        <div className="bg-white rounded-xl shadow-lg flex flex-col max-h-[350px] sm:max-h-[450px]">
+        {/* Prompt Assistant */}
+        <div className="bg-white rounded-xl shadow-lg flex flex-col">
           <div className="p-3 sm:p-4 border-b flex justify-between items-center">
             <h2 className="text-sm sm:text-base font-semibold">Prompt Assistant</h2>
-            <span className="text-xs sm:text-sm text-slate-500">{history.length} prompts</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm text-slate-500">{history.length} prompts</span>
+              <MinimizeButton 
+                isMinimized={isPromptMinimized}
+                onClick={() => setIsPromptMinimized(!isPromptMinimized)}
+              />
+            </div>
           </div>
 
-          <div className="flex-1 overflow-auto p-2 sm:p-3 max-h-[200px] sm:max-h-[250px]">
-            {history.map((item, index) => (
-              <div key={index} className="p-2 sm:p-3 bg-slate-50 rounded-lg mb-2 text-xs sm:text-sm">
-                {item}
+          {!isPromptMinimized && (
+            <>
+              <div className="flex-1 overflow-auto p-2 sm:p-3 max-h-[200px] sm:max-h-[250px]">
+                {history.map((item, index) => (
+                  <div key={index} className="p-2 sm:p-3 bg-slate-50 rounded-lg mb-2 text-xs sm:text-sm">
+                    {item}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
-          <form onSubmit={handlePromptSubmit} className="p-3 sm:p-4 border-t">
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Enter your prompt here..."
-              className="w-full p-2 sm:p-3 border rounded-xl resize-none h-[80px] sm:h-[100px] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-black-500"
-            />
-            <button
-              type="submit"
-              className="mt-2 sm:mt-3 w-full bg-black text-white py-2 sm:py-2.5 rounded-xl hover:bg-black text-xs sm:text-sm font-medium transition-colors"
-            >
-              Generate Image
-            </button>
-          </form>
+              <form onSubmit={handlePromptSubmit} className="p-3 sm:p-4 border-t">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Enter your prompt here..."
+                  className="w-full p-2 sm:p-3 border rounded-xl resize-none h-[80px] sm:h-[100px] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-black-500"
+                />
+                <button
+                  type="submit"
+                  className="mt-2 sm:mt-3 w-full bg-black text-white py-2 sm:py-2.5 rounded-xl hover:bg-black text-xs sm:text-sm font-medium transition-colors"
+                >
+                  Generate Image
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
 
