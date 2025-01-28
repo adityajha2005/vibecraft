@@ -1,7 +1,7 @@
-'use client'
+'use client';
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { IoVideocam, IoVideocamOff, IoCamera } from 'react-icons/io5'; // Import icons
 import Toolbar from '@/components/dashboard/Toolbar';
 import SketchCanvas from '@/components/dashboard/SketchCanvas';
 import CameraPanel from '@/components/dashboard/CameraPanel';
@@ -11,7 +11,6 @@ import type { ImageSettings } from '@/components/SettingsModal';
 import Footer from '@/components/dashboard/Footer';
 import SketchFeatures from '@/components/dashboard/SketchFeatures';
 import { generateImageFromSketch } from '@/lib/sketch-to-image';
-
 
 const Dashboard = () => {
   // State variables
@@ -25,9 +24,11 @@ const Dashboard = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isSketchMode, setIsSketchMode] = useState(false); // Missing state
-  const [activeColor, setActiveColor] = useState('#000000'); // Missing state
-  const [brushSize, setBrushSize] = useState(5); // Missing state
+  const [isSketchMode, setIsSketchMode] = useState(false);
+  const [activeColor, setActiveColor] = useState('#000000');
+  const [brushSize, setBrushSize] = useState(5);
+  const [isMinimized, setIsMinimized] = useState(false);
+
   const [imageSettings, setImageSettings] = useState<ImageSettings>({
     seed: Math.floor(Math.random() * 1000000),
     shape: 'square',
@@ -38,21 +39,21 @@ const Dashboard = () => {
   });
 
   // Fetch saved artworks for the current user
-  const userId = 'user-id-here'; // Replace with actual user ID
-  useEffect(() => {
-    const fetchArtworks = async () => {
-      try {
-        const response = await fetch(`/api/artworks/user/${userId}`);
-        const data = await response.json();
-        if (data.length > 0) {
-          setDisplayImage(data[0].image); // Display the first artwork
-        }
-      } catch (error) {
-        console.error('Failed to fetch artworks:', error);
-      }
-    };
-    fetchArtworks();
-  }, [userId]);
+  const userId = 'user-id-here';
+//  useEffect(() => {
+  //   const fetchArtworks = async () => {
+  //     try {
+  //       const response = await fetch(`/api/artworks/user/${userId}`);
+  //       const data = await response.json();
+  //       if (data.length > 0) {
+  //         setDisplayImage(data[0].image);
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to fetch artworks:', error);
+  //     }
+  //   };
+  //   fetchArtworks();
+  // }, [userId]);
 
   // Handle prompt submission
   const handlePromptSubmit = async (e: React.FormEvent) => {
@@ -60,15 +61,14 @@ const Dashboard = () => {
     if (prompt.trim()) {
       setHistory((prev) => [...prev, prompt]);
 
-      // Call the backend to generate an image from the prompt
       try {
         const response = await fetch('/api/ai/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, ...imageSettings }), // Include image settings
+          body: JSON.stringify({ prompt, ...imageSettings }),
         });
         const data = await response.json();
-        setDisplayImage(data.imageUrl); // Set the generated image
+        setDisplayImage(data.imageUrl);
       } catch (error) {
         console.error('Failed to generate image:', error);
         alert('Failed to generate image. Please try again.');
@@ -115,7 +115,6 @@ const Dashboard = () => {
     }
   };
 
-
   const handleGenerateFromSketch = async (sketchDataUrl: string, prompt: string) => {
     setIsGenerating(true);
     try {
@@ -130,35 +129,6 @@ const Dashboard = () => {
       setIsGenerating(false);
     }
   };
-
-  // Handle camera activation
-  useEffect(() => {
-    if (isCameraActive) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          const videoElement = document.querySelector('video');
-          if (videoElement) {
-            videoElement.srcObject = stream;
-          }
-        })
-        .catch((error) => {
-          console.error('Error accessing camera:', error);
-          alert('Failed to access camera. Please ensure permissions are granted.');
-        });
-    }
-  }, [isCameraActive]);
-
-  // Clean up camera stream on unmount
-  useEffect(() => {
-    return () => {
-      const videoElement = document.querySelector('video');
-      if (videoElement && videoElement.srcObject) {
-        const stream = videoElement.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, []);
 
   return (
     <div className="min-h-screen w-full relative bg-slate-50 overflow-y-auto">
@@ -184,7 +154,6 @@ const Dashboard = () => {
             onGenerate={handleGenerateFromSketch}
             isGenerating={isGenerating}
           />
-
         ) : (
           displayImage && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -200,37 +169,12 @@ const Dashboard = () => {
 
       {/* Floating Panel with Camera and Prompt */}
       <div className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] flex flex-col gap-4 p-4 sm:p-0">
-        {/* Camera Preview */}
-        <div className="bg-white rounded-xl shadow-lg">
-          <div className="p-3 sm:p-4 border-b flex justify-between items-center">
-            <h2 className="text-sm sm:text-base font-semibold">Camera Preview</h2>
-            <button
-              onClick={() => setIsCameraActive(!isCameraActive)}
-              className={`p-2 rounded-md ${isCameraActive ? 'bg-red-500 text-white' : 'bg-slate-100'}`}
-            >
-              {isCameraActive ? <IoVideocamOff /> : <IoVideocam />}
-            </button>
-          </div>
-
-          <div className="aspect-video relative bg-slate-900 overflow-hidden">
-            {isCameraActive ? (
-              <video
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                playsInline
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <IoCamera size={24} />
-              </div>
-            )}
-            {/* Facial Recognition Overlay (to be implemented) */}
-            <div className="absolute inset-0 pointer-events-none">
-              {/* Face detection overlay */}
-            </div>
-          </div>
-        </div>
+      <CameraPanel
+          isCameraActive={isCameraActive}
+          setIsCameraActive={setIsCameraActive}
+          isMinimized={isMinimized}
+          onMinimize={() => setIsMinimized(!isMinimized)}
+        />
 
         {/* Prompt Area */}
         <div className="bg-white rounded-xl shadow-lg flex flex-col max-h-[350px] sm:max-h-[450px]">
@@ -279,5 +223,4 @@ const Dashboard = () => {
   );
 };
 
-
-export default Dashboard
+export default Dashboard;

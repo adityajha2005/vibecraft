@@ -27,6 +27,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
+    "react-toastify": "^11.0.3",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -38,6 +40,8 @@
     "@types/node": "^20.17.16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-toastify": "^4.0.2",
+    "@types/socket.io-client": "^1.4.36",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
