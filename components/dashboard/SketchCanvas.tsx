@@ -6,7 +6,7 @@ interface SketchCanvasProps {
   brushSize: number
   setBrushSize: (size: number) => void
   setActiveColor: (color: string) => void
-  onGenerate: (dataUrl: string, prompt: string) => void
+  onGenerate: (dataUrl: string, prompt: string) => Promise<ArrayBuffer>
   isGenerating: boolean
 }
 
@@ -23,17 +23,22 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
   const [isDrawing, setIsDrawing] = useState(false)
   const canvasWrapperRef = useRef<HTMLDivElement>(null)
   const [prompt, setPrompt] = useState('')
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
 
   useEffect(() => {
     if (canvasRef.current && canvasWrapperRef.current) {
       const canvas = canvasRef.current
       const wrapper = canvasWrapperRef.current
       
-      canvas.style.width = '100%'
-      canvas.style.height = '100%'
+      // Make the canvas square based on the smaller dimension
+      const size = Math.min(wrapper.clientWidth, wrapper.clientHeight)
       
-      canvas.width = wrapper.clientWidth
-      canvas.height = wrapper.clientHeight
+      canvas.style.width = `${size}px`
+      canvas.style.height = `${size}px`
+      
+      // Set actual canvas dimensions (making them square)
+      canvas.width = size
+      canvas.height = size
       
       const context = canvas.getContext('2d')
       if (context) {
@@ -90,18 +95,27 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     const context = contextRef.current
     if (canvas && context) {
       context.clearRect(0, 0, canvas.width, canvas.height)
+      setGeneratedImage(null)
     }
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!canvasRef.current || !prompt.trim()) return
     const sketchDataUrl = canvasRef.current.toDataURL('image/png')
-    onGenerate(sketchDataUrl, prompt)
+    try {
+      const arrayBuffer = await onGenerate(sketchDataUrl, prompt)
+      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' })
+      const imageUrl = URL.createObjectURL(blob)
+      setGeneratedImage(imageUrl)
+    } catch (error) {
+      console.error('Failed to generate image:', error)
+    }
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
-      <div className="w-full sm:w-auto bg-white p-2 rounded-lg shadow-lg flex gap-2 mb-4 sm:absolute sm:top-4 sm:left-4 z-10">
+    <div className="relative w-full h-full flex flex-col items-center p-4">
+      {/* Controls */}
+      <div className="w-full bg-white p-2 rounded-lg shadow-lg flex gap-2 mb-4 z-10">
         <input 
           type="color" 
           value={activeColor}
@@ -124,32 +138,54 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
         </button>
       </div>
 
-      <div 
-        ref={canvasWrapperRef}
-        className="relative w-full max-w-[1200px] h-[calc(80vh-80px)] sm:h-[calc(85vh-80px)] flex justify-center items-center"
-      >
-        <canvas
-          ref={canvasRef}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          className="border-2 border-gray-300 rounded-lg bg-white cursor-crosshair absolute inset-0 shadow-lg"
-        />
+      {/* Split View Container */}
+      <div className="w-full flex flex-col sm:flex-row gap-4 flex-grow">
+        {/* Sketch Area */}
+        <div className="w-full sm:w-1/2 h-[50vh] sm:h-[calc(85vh-160px)] flex items-center justify-center">
+          <div 
+            ref={canvasWrapperRef}
+            className="relative aspect-square h-full"
+          >
+            <canvas
+              ref={canvasRef}
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              className="border-2 border-gray-300 rounded-lg bg-white cursor-crosshair absolute inset-0 shadow-lg"
+            />
+          </div>
+        </div>
+
+        {/* Generated Image Area */}
+        <div className="w-full sm:w-1/2 h-[50vh] sm:h-[calc(85vh-160px)] flex items-center justify-center">
+          {generatedImage ? (
+            <img 
+              src={generatedImage} 
+              alt="Generated artwork"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+            />
+          ) : (
+            <div className="w-full aspect-square h-auto border-2 border-gray-300 border-dashed rounded-lg flex items-center justify-center text-gray-400">
+              Generated image will appear here
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="w-full sm:w-auto mt-6 mb-8 flex flex-col items-center gap-4">
+      {/* Prompt Input and Generate Button */}
+      <div className="w-full mt-6 flex flex-col sm:flex-row items-center gap-4 justify-center">
         <input
           type="text"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Enter a prompt for your sketch"
-          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg"
+          className="w-full sm:w-96 px-4 py-2 border border-gray-300 rounded-lg"
         />
         <button
           onClick={handleGenerate}
           disabled={isGenerating || !prompt.trim()}
-          className="px-8 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-8 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isGenerating ? 'Generating...' : 'Generate from Sketch'}
         </button>

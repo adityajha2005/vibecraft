@@ -18,8 +18,10 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ sketch }) => {
       const reader = new FileReader();
       reader.onload = async (event) => {
         const sketchDataUrl = event.target?.result as string;
-        const result = await generateImageFromSketch(sketchDataUrl,prompt);
-        const imageUrl = URL.createObjectURL(result);
+        const result = await generateImageFromSketch(sketchDataUrl, prompt);
+        // Convert ArrayBuffer to Blob
+        const blob = new Blob([result], { type: 'image/png' });
+        const imageUrl = URL.createObjectURL(blob);
         setGeneratedImage(imageUrl);
       };
       reader.readAsDataURL(sketch);

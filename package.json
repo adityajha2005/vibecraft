@@ -14,6 +14,7 @@
     "@prisma/client": "^6.2.1",
     "@radix-ui/react-slot": "^1.1.1",
     "@tabler/icons-react": "^3.29.0",
+    "@techstark/opencv-js": "^4.7.0-release.1",
     "@types/axios": "^0.9.36",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
