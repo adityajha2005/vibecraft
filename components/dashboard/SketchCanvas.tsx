@@ -24,6 +24,9 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
   const canvasWrapperRef = useRef<HTMLDivElement>(null)
   const [prompt, setPrompt] = useState('')
   const [generatedImage, setGeneratedImage] = useState<string | null>(null)
+  const [history, setHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+  const [isEraser, setIsEraser] = useState(false)
 
   useEffect(() => {
     if (canvasRef.current && canvasWrapperRef.current) {
@@ -52,10 +55,10 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
 
   useEffect(() => {
     if (contextRef.current) {
-      contextRef.current.strokeStyle = activeColor
+      contextRef.current.strokeStyle = isEraser ? '#ffffff' : activeColor
       contextRef.current.lineWidth = brushSize
     }
-  }, [activeColor, brushSize])
+  }, [isEraser, activeColor, brushSize])
 
   const getMousePos = (e: React.MouseEvent) => {
     if (!canvasRef.current) return { x: 0, y: 0 }
@@ -118,6 +121,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     if (!contextRef.current) return
     contextRef.current.closePath()
     setIsDrawing(false)
+    saveHistory()
   }
 
   const stopDrawingTouch = (e: React.TouchEvent) => {
@@ -125,6 +129,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     if (!contextRef.current) return
     contextRef.current.closePath()
     setIsDrawing(false)
+    saveHistory()
   }
 
   const clearCanvas = () => {
@@ -157,6 +162,45 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     }
   }
 
+  const saveHistory = () => {
+    if (!canvasRef.current) return
+    const snapshot = canvasRef.current.toDataURL()
+    const newHistory = history.slice(0, historyIndex + 1)
+    newHistory.push(snapshot)
+    setHistory(newHistory)
+    setHistoryIndex(newHistory.length - 1)
+  }
+
+  const handleUndo = () => {
+    if (historyIndex <= 0) return
+    const newIndex = historyIndex - 1
+    setHistoryIndex(newIndex)
+    restoreCanvas(history[newIndex])
+  }
+
+  const handleRedo = () => {
+    if (historyIndex >= history.length - 1) return
+    const newIndex = historyIndex + 1
+    setHistoryIndex(newIndex)
+    restoreCanvas(history[newIndex])
+  }
+
+  const restoreCanvas = (dataUrl: string) => {
+    if (!canvasRef.current || !contextRef.current) return
+    const canvas = canvasRef.current
+    const context = contextRef.current
+    const img = new Image()
+    img.src = dataUrl
+    img.onload = () => {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      context.drawImage(img, 0, 0)
+    }
+  }
+
+  const toggleEraser = () => {
+    setIsEraser(!isEraser)
+  }
+
   return (
     <div className="relative w-full h-full flex flex-col items-center p-4">
       {/* Controls */}
@@ -180,6 +224,11 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
           className="p-1 hover:bg-slate-100 rounded"
         >
           <IoTrashBin className="w-6 h-6" />
+        </button>
+        <button onClick={handleUndo} className="p-1 hover:bg-slate-100 rounded">Undo</button>
+        <button onClick={handleRedo} className="p-1 hover:bg-slate-100 rounded">Redo</button>
+        <button onClick={toggleEraser} className="p-1 hover:bg-slate-100 rounded">
+          {isEraser ? 'Disable Eraser' : 'Eraser'}
         </button>
       </div>
 
