@@ -10,6 +10,15 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ sketch }) => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  };
+
   const handleGenerate = async () => {
     if (!sketch) return;
     setIsLoading(true);
@@ -19,10 +28,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ sketch }) => {
       reader.onload = async (event) => {
         const sketchDataUrl = event.target?.result as string;
         const result = await generateImageFromSketch(sketchDataUrl, prompt);
-        // Convert ArrayBuffer to Blob
-        const blob = new Blob([result], { type: 'image/png' });
-        const imageUrl = URL.createObjectURL(blob);
-        setGeneratedImage(imageUrl);
+        const base64String = arrayBufferToBase64(result);
+        setGeneratedImage(`data:image/png;base64,${base64String}`);
       };
       reader.readAsDataURL(sketch);
     } catch (error) {

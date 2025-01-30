@@ -69,9 +69,31 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     }
   }
 
+  const getTouchPos = (e: React.TouchEvent) => {
+    if (!canvasRef.current) return { x: 0, y: 0 }
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const touch = e.touches[0]
+    return {
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY
+    }
+  }
+
   const startDrawing = (e: React.MouseEvent) => {
     if (!contextRef.current) return
     const pos = getMousePos(e)
+    contextRef.current.beginPath()
+    contextRef.current.moveTo(pos.x, pos.y)
+    setIsDrawing(true)
+  }
+
+  const startDrawingTouch = (e: React.TouchEvent) => {
+    if (!contextRef.current) return
+    e.preventDefault()
+    const pos = getTouchPos(e)
     contextRef.current.beginPath()
     contextRef.current.moveTo(pos.x, pos.y)
     setIsDrawing(true)
@@ -84,7 +106,22 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     contextRef.current.stroke()
   }
 
+  const drawTouch = (e: React.TouchEvent) => {
+    if (!isDrawing || !contextRef.current) return
+    e.preventDefault()
+    const pos = getTouchPos(e)
+    contextRef.current.lineTo(pos.x, pos.y)
+    contextRef.current.stroke()
+  }
+
   const stopDrawing = () => {
+    if (!contextRef.current) return
+    contextRef.current.closePath()
+    setIsDrawing(false)
+  }
+
+  const stopDrawingTouch = (e: React.TouchEvent) => {
+    e.preventDefault()
     if (!contextRef.current) return
     contextRef.current.closePath()
     setIsDrawing(false)
@@ -99,14 +136,22 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
     }
   }
 
+  const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+    let binary = ''
+    const bytes = new Uint8Array(buffer)
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    return window.btoa(binary)
+  }
+
   const handleGenerate = async () => {
     if (!canvasRef.current || !prompt.trim()) return
     const sketchDataUrl = canvasRef.current.toDataURL('image/png')
     try {
       const arrayBuffer = await onGenerate(sketchDataUrl, prompt)
-      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' })
-      const imageUrl = URL.createObjectURL(blob)
-      setGeneratedImage(imageUrl)
+      const base64String = arrayBufferToBase64(arrayBuffer)
+      setGeneratedImage(`data:image/jpeg;base64,${base64String}`)
     } catch (error) {
       console.error('Failed to generate image:', error)
     }
@@ -152,6 +197,9 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
+              onTouchStart={startDrawingTouch}
+              onTouchMove={drawTouch}
+              onTouchEnd={stopDrawingTouch}
               className="border-2 border-gray-300 rounded-lg bg-white cursor-crosshair absolute inset-0 shadow-lg"
             />
           </div>
