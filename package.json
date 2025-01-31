@@ -16,6 +16,7 @@
     "@tabler/icons-react": "^3.29.0",
     "@techstark/opencv-js": "^4.7.0-release.1",
     "@types/axios": "^0.9.36",
+    "@vercel/analytics": "^1.4.1",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
