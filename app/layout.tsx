@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: "VibeCraft",
   description: "Unleash your creativity. Let AI complete your vision.",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
