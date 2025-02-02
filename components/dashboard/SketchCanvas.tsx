@@ -96,6 +96,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
   const startDrawingTouch = (e: React.TouchEvent) => {
     if (!contextRef.current) return
     e.preventDefault()
+    e.stopPropagation() // Add this line
     const pos = getTouchPos(e)
     contextRef.current.beginPath()
     contextRef.current.moveTo(pos.x, pos.y)
@@ -112,6 +113,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
   const drawTouch = (e: React.TouchEvent) => {
     if (!isDrawing || !contextRef.current) return
     e.preventDefault()
+    e.stopPropagation() // Add this line
     const pos = getTouchPos(e)
     contextRef.current.lineTo(pos.x, pos.y)
     contextRef.current.stroke()
@@ -126,6 +128,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
 
   const stopDrawingTouch = (e: React.TouchEvent) => {
     e.preventDefault()
+    e.stopPropagation() // Add this line
     if (!contextRef.current) return
     contextRef.current.closePath()
     setIsDrawing(false)
@@ -250,6 +253,7 @@ const SketchCanvas: React.FC<SketchCanvasProps> = ({
               onTouchMove={drawTouch}
               onTouchEnd={stopDrawingTouch}
               className="border-2 border-gray-300 rounded-lg bg-white cursor-crosshair absolute inset-0 shadow-lg"
+              style={{ touchAction: 'none' }}
             />
           </div>
         </div>

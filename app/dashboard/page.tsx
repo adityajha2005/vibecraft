@@ -244,7 +244,7 @@ const Dashboard = () => {
         </div>
 
         {/* Prompt Assistant */}
-        <div className="bg-white rounded-xl shadow-lg flex flex-col">
+        {/* <div className="bg-white rounded-xl shadow-lg flex flex-col">
           <div className="p-3 sm:p-4 border-b flex justify-between items-center">
             <h2 className="text-sm sm:text-base font-semibold">Prompt Assistant</h2>
             <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ const Dashboard = () => {
               </form>
             </>
           )}
-        </div>
+        </div> */}
       </div>
 
       <SettingsModal
